@@ -14,18 +14,16 @@ public class ItemParser {
     private Integer itemCount = 0;
     private Integer exceptionsCount = 0;
 
-    ItemParser(String raw) {
+    public ItemParser(String raw) {
         rawItems = parseRawDataIntoStringArray(raw);
         try {
             createMap();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
-    ItemParser() {
-
+    public ItemParser() {
     }
 
     private void expectionHandled() throws ItemParseException {
@@ -55,26 +53,31 @@ public class ItemParser {
     }
 
 
-    public Item parseStringIntoItem(String rawItem) throws ItemParseException {
-
+    public Item parseStringIntoItem(String rawItem) {
+      /*  if (checkName(rawItem).equals(" ") || checkPrice(rawItem).equals(" ")){
+            expectionHandled();
+        }*/
         String name = checkName(rawItem);
         Double price = Double.valueOf(checkPrice(rawItem));
         String type = checkType(rawItem);
         String expiration = checkExpiration(rawItem);
-        if (checkName(rawItem) == null | checkPrice(rawItem) == null) expectionHandled();
 
         return new Item(name, price, type, expiration);
-
     }
 
     public ArrayList<Item> rawItemToCleanItem() throws ItemParseException {
         ArrayList<Item> itemArrayList = new ArrayList<Item>();
+
         for (int i = 0; i < rawItems.size(); i++) {
             String s = rawItems.get(i);
-
             Item item = parseStringIntoItem(rawItems.get(i));
             System.out.println(item.toString());
-            itemArrayList.add(item);
+
+            if (!item.getName().equals(" ") && !item.getPrice().equals(0.0)) {
+                itemArrayList.add(item);
+            } else {
+                exceptionsCount++;
+            }
         }
         return itemArrayList;
     }
@@ -173,6 +176,7 @@ public class ItemParser {
     }
 
     public void print() {
+
         for (Map.Entry<String, ArrayList<ValueList>> entry : theMap.entrySet()) {
             //name of the Product;
             String name = entry.getKey();
@@ -196,7 +200,7 @@ public class ItemParser {
         if (matcherName.find()) {
             return matcherName.group(2).toLowerCase();
         }
-        return null;
+        return " ";
     }
 
     public String checkPrice(String input) {
@@ -207,7 +211,7 @@ public class ItemParser {
             return matcherPrice.group(2).toLowerCase();
         }
 
-        return null;
+        return "0.0";
     }
 
     public String checkType(String input) {
@@ -217,7 +221,7 @@ public class ItemParser {
         if (matcherType.find()) {
             return matcherType.group(2).toLowerCase();
         }
-        return null;
+        return " ";
     }
 
     public String checkExpiration(String input) {
@@ -228,6 +232,6 @@ public class ItemParser {
             return matcherExpiration.group(2).toLowerCase();
         }
 
-        return null;
+        return " ";
     }
 }
